@@ -10,16 +10,18 @@ namespace PersonaPatcher
     class Program
     {
         // Elf size constants
-        public const int ELF_SIZE_PERSONA4_NTSC     = 0x838C1C;
-        public const int ELF_SIZE_PERSONA4_PAL      = 0x83C19C;
-        public const int ELF_SIZE_PERSONA3FES_NTSC  = 0x8ACE9C;
-        public const int ELF_SIZE_PERSONA3_NTSC     = 0x79DD9C;
+        public const int ELF_SIZE_PERSONA4_NTSC = 0x838C1C;
+        public const int ELF_SIZE_PERSONA4_PAL = 0x83C19C;
+        public const int ELF_SIZE_PERSONA3FES_NTSC = 0x8ACE9C;
+        public const int ELF_SIZE_PERSONA3FES_PAL = 0x8AF21C;
+        public const int ELF_SIZE_PERSONA3_NTSC = 0x79DD9C;
 
         // Cvm listing offset constants
-        public const int CVM_LIST_OFFSET_PERSONA4_NTSC      = 0x4598C0;
-        public const int CVM_LIST_OFFSET_PERSONA4_PAL       = 0x45CBC0;
-        public const int CVM_LIST_OFFSET_PERSONA3FES_NTSC   = 0x4E51D0;
-        public const int CVM_LIST_OFFSET_PERSONA3_NTSC      = 0x4E5FA0;
+        public const int CVM_LIST_OFFSET_PERSONA4_NTSC = 0x4598C0;
+        public const int CVM_LIST_OFFSET_PERSONA4_PAL = 0x45CBC0;
+        public const int CVM_LIST_OFFSET_PERSONA3FES_NTSC = 0x4E51D0;
+        public const int CVM_LIST_OFFSET_PERSONA3FES_PAL = 0X4E7450;
+        public const int CVM_LIST_OFFSET_PERSONA3_NTSC = 0x4E5FA0;
 
         // Cvm order
         public static readonly string[] CVM_ORDER_PERSONA4 = new string[4]
@@ -37,7 +39,8 @@ namespace PersonaPatcher
             { ELF_SIZE_PERSONA4_NTSC,       Tuple.Create(CVM_LIST_OFFSET_PERSONA4_NTSC,     CVM_ORDER_PERSONA4) },
             { ELF_SIZE_PERSONA4_PAL,        Tuple.Create(CVM_LIST_OFFSET_PERSONA4_PAL,      CVM_ORDER_PERSONA4) },
             { ELF_SIZE_PERSONA3FES_NTSC,    Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
-            { ELF_SIZE_PERSONA3_NTSC,       Tuple.Create(CVM_LIST_OFFSET_PERSONA3_NTSC,     CVM_ORDER_PERSONA3) }
+            { ELF_SIZE_PERSONA3_NTSC,       Tuple.Create(CVM_LIST_OFFSET_PERSONA3_NTSC,     CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3FES_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,   CVM_ORDER_PERSONA3) }
         };
 
         static void Main(string[] args)
