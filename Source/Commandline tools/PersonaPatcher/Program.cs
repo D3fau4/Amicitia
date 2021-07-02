@@ -14,6 +14,8 @@ namespace PersonaPatcher
         public const int ELF_SIZE_PERSONA4_PAL = 0x83C19C;
         public const int ELF_SIZE_PERSONA3FES_NTSC = 0x8ACE9C;
         public const int ELF_SIZE_PERSONA3FES_PAL = 0x8AF21C;
+        public const int ELF_SIZE_PERSONA3FESEXPANDED_NTSC = 0x8ACF3C;
+        public const int ELF_SIZE_PERSONA3FESEXPANDED_PAL = 0x8AF2BC;
         public const int ELF_SIZE_PERSONA3_NTSC = 0x79DD9C;
 
         // Cvm listing offset constants
@@ -36,11 +38,13 @@ namespace PersonaPatcher
 
         public static Dictionary<int, Tuple<int, string[]>> CvmListDataDictionary = new Dictionary<int, Tuple<int, string[]>>()
         {
-            { ELF_SIZE_PERSONA4_NTSC,       Tuple.Create(CVM_LIST_OFFSET_PERSONA4_NTSC,     CVM_ORDER_PERSONA4) },
-            { ELF_SIZE_PERSONA4_PAL,        Tuple.Create(CVM_LIST_OFFSET_PERSONA4_PAL,      CVM_ORDER_PERSONA4) },
-            { ELF_SIZE_PERSONA3FES_NTSC,    Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
-            { ELF_SIZE_PERSONA3_NTSC,       Tuple.Create(CVM_LIST_OFFSET_PERSONA3_NTSC,     CVM_ORDER_PERSONA3) },
-            { ELF_SIZE_PERSONA3FES_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,   CVM_ORDER_PERSONA3) }
+            { ELF_SIZE_PERSONA4_NTSC,               Tuple.Create(CVM_LIST_OFFSET_PERSONA4_NTSC,     CVM_ORDER_PERSONA4) },
+            { ELF_SIZE_PERSONA4_PAL,                Tuple.Create(CVM_LIST_OFFSET_PERSONA4_PAL,      CVM_ORDER_PERSONA4) },
+            { ELF_SIZE_PERSONA3FES_NTSC,            Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3_NTSC,               Tuple.Create(CVM_LIST_OFFSET_PERSONA3_NTSC,     CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3FESEXPANDED_NTSC,    Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3FESEXPANDED_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA4_PAL,      CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3FES_PAL,             Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,   CVM_ORDER_PERSONA3) }
         };
 
         static void Main(string[] args)
@@ -67,7 +71,9 @@ namespace PersonaPatcher
             {
                 if (!CvmListDataDictionary.TryGetValue((int)stream.Length, out data))
                 {
+                    Console.WriteLine(stream.Length);
                     Console.WriteLine("Error: Executable not supported");
+                    Console.ReadKey();
                     return;
                 }
 
