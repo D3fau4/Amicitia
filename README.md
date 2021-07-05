@@ -1,3 +1,11 @@
+# Custom version of Amicitia's PersonaPatcher
+This is an updated version of the old PersonaPatcher (made by (the Amicitia community)[https://github.com/TGEnigma/Amicitia]) 
+that aims to add support to all the previously non-compatible versions of Persona 3 FES, and also support the customized ELF files
+used in the P3FES Spanish Translation by (Traducciones del Tío Víctor)[https://tiovictor.romhackhispano.org/persona-3-fes/], the Persona 3 FES 
+Spanish translation team, TraduSquare and Proyecto AMALA.
+
+The original README's contents are displayed below.
+
 # Amicitia
 Editor for file formats used in Atlus' Persona games
 
