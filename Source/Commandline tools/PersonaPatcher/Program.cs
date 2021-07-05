@@ -122,8 +122,7 @@ namespace PersonaPatcher
                 writer.Write(elfFooter);
             }
 
-            Console.WriteLine("\nDone!, press any key to continue");
-            Console.ReadKey();
+            Console.WriteLine("\nDone!");
         }
     }
 }
