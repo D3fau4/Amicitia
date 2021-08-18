@@ -498,17 +498,49 @@
             return structArray;
         }
 
-        public static void WriteStructure<T>(this BinaryWriter writer, T structure)
+        public static void WriteStructure<T>(this BinaryWriter writer,T structure, bool expandedtable = false, FileSystems.CVM.CvmDirectoryListing.Region type = 0)
         {
-            int structureSize = Marshal.SizeOf(typeof(T));
-            byte[] buffer = new byte[structureSize];
-            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            if (expandedtable != true)
+            {
+                int structureSize = Marshal.SizeOf(typeof(T));
+                byte[] buffer = new byte[structureSize];
+                GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
-            Marshal.StructureToPtr(structure, handle.AddrOfPinnedObject(), false);
+                Marshal.StructureToPtr(structure, handle.AddrOfPinnedObject(), false);
 
-            handle.Free();
+                handle.Free();
 
-            writer.Write(buffer, 0, buffer.Length);
+                writer.Write(buffer, 0, buffer.Length);
+            } 
+            else
+            {
+                byte[] NTSCheader = {
+                    0x43, 0x00, 0x00, 0x00, 0x43, 0x00, 0x00, 0x00, 0xF9, 0x00, 0x00, 0x00,
+                    0x23, 0x44, 0x69, 0x72, 0x4C, 0x73, 0x74, 0x23, 0x00, 0x00
+                };
+
+                byte[] PALheader = {
+                    0x44, 0x00, 0x00, 0x00, 0x44, 0x00, 0x00, 0x00, 0xF6, 0x00, 0x00, 0x00,
+                    0x23, 0x44, 0x69, 0x72, 0x4C, 0x73, 0x74, 0x23, 0x00, 0x00
+                };
+
+                BinaryWriter writer2 = new BinaryWriter(File.Open("NewTable.mod", FileMode.OpenOrCreate));
+                int structureSize = Marshal.SizeOf(typeof(T));
+                byte[] buffer = new byte[structureSize];
+                GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+
+                Marshal.StructureToPtr(structure, handle.AddrOfPinnedObject(), false);
+                handle.Free();
+
+                writer2.Seek(writer2.BaseStream.Length, SeekOrigin.Begin);
+                if (writer2.BaseStream.Length == 0 && type == FileSystems.CVM.CvmDirectoryListing.Region.NTSC)
+                    writer2.Write(NTSCheader, 0, NTSCheader.Length);
+                else if (writer2.BaseStream.Length == 0 && type == FileSystems.CVM.CvmDirectoryListing.Region.PAL)
+                    writer2.Write(PALheader, 0, PALheader.Length);
+                writer2.Write(buffer);
+                writer.Write(buffer, 0, buffer.Length);
+                writer2.Close();
+            }
         }
 
         public static void WriteStructure<T>(this BinaryWriter writer, T structure, int size)

@@ -79,9 +79,16 @@ namespace AmicitiaLibrary.FileSystems.CVM
             return Name;
         }
 
-        internal void InternalWrite(BinaryWriter writer)
+        internal void InternalWrite(BinaryWriter writer, int offset = 0, CvmDirectoryListing.Region type = 0)
         {
-            writer.WriteStructure(mHeader);
+            if (offset != 0)
+            {
+                writer.WriteStructure(mHeader, true, type);
+            }
+            else
+            {
+                writer.WriteStructure(mHeader);
+            }
         }
 
         internal void Update(IsoDirectoryRecord record)

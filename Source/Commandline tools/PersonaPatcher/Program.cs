@@ -24,6 +24,8 @@ namespace PersonaPatcher
         public const int CVM_LIST_OFFSET_PERSONA3FES_NTSC = 0x4E51D0;
         public const int CVM_LIST_OFFSET_PERSONA3FES_PAL = 0X4E7450;
         public const int CVM_LIST_OFFSET_PERSONA3_NTSC = 0x4E5FA0;
+        public const int CVM_LIST_OFFSET_PERSONA3FESEXPANDED_PAL = 0x6D0280;
+        public const int CVM_LIST_OFFSET_PERSONA3FESEXPANDED_NTSC = 0x6CDF00;
 
         // Cvm order
         public static readonly string[] CVM_ORDER_PERSONA4 = new string[4]
@@ -43,14 +45,12 @@ namespace PersonaPatcher
             { ELF_SIZE_PERSONA3FES_NTSC,            Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
             { ELF_SIZE_PERSONA3_NTSC,               Tuple.Create(CVM_LIST_OFFSET_PERSONA3_NTSC,     CVM_ORDER_PERSONA3) },
             { ELF_SIZE_PERSONA3FESEXPANDED_NTSC,    Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
-            { ELF_SIZE_PERSONA3FESEXPANDED_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA4_PAL,      CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3FESEXPANDED_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,      CVM_ORDER_PERSONA3) },
             { ELF_SIZE_PERSONA3FES_PAL,             Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,   CVM_ORDER_PERSONA3) }
         };
 
         static void Main(string[] args)
         {
-            Console.SetBufferSize(Console.BufferWidth, 32766);
-
             if (args.Length != 2)
             {
                 Console.WriteLine("Usage: \n");
@@ -64,16 +64,16 @@ namespace PersonaPatcher
             // Declare variables
             byte[] elfHeader;
             byte[] elfFooter;
+            int filelenght;
             CvmExecutableListing[] cvmExecutableListings;
             Tuple<int, string[]> data;
 
             using (FileStream stream = File.OpenRead(args[0]))
             {
+                filelenght = (int)stream.Length;
                 if (!CvmListDataDictionary.TryGetValue((int)stream.Length, out data))
                 {
-                    Console.WriteLine(stream.Length);
                     Console.WriteLine("Error: Executable not supported");
-                    Console.ReadKey();
                     return;
                 }
 
@@ -116,10 +116,35 @@ namespace PersonaPatcher
 
                 foreach (CvmExecutableListing cvmExecutableList in cvmExecutableListings)
                 {
-                    cvmExecutableList.Save(writer.BaseStream);
+                    if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_NTSC)
+                    {
+                        cvmExecutableList.Save(writer.BaseStream, CVM_LIST_OFFSET_PERSONA3FESEXPANDED_NTSC, CvmDirectoryListing.Region.NTSC);
+                    } 
+                    else if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_PAL)
+                    {
+                        cvmExecutableList.Save(writer.BaseStream, CVM_LIST_OFFSET_PERSONA3FESEXPANDED_PAL, CvmDirectoryListing.Region.NTSC);
+                    }
+                    else
+                    {
+                        cvmExecutableList.Save(writer.BaseStream);
+                    }
                 }
 
                 writer.Write(elfFooter);
+                writer.Close();
+            }
+
+            if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_NTSC || filelenght == ELF_SIZE_PERSONA3FESEXPANDED_PAL)
+            {
+                var newtable = File.ReadAllBytes("NewTable.mod");
+                BinaryWriter writer = new BinaryWriter(File.OpenWrite(args[0]));
+                if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_NTSC)
+                    writer.Seek(CVM_LIST_OFFSET_PERSONA3FESEXPANDED_NTSC, SeekOrigin.Begin);
+                else
+                    writer.Seek(CVM_LIST_OFFSET_PERSONA3FESEXPANDED_PAL, SeekOrigin.Begin);
+                writer.Write(newtable);
+                writer.Close();
+                File.Delete("NewTable.mod");
             }
 
             Console.WriteLine("\nDone!");

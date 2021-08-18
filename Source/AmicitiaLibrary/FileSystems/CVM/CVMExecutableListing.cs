@@ -46,5 +46,13 @@ namespace AmicitiaLibrary.FileSystems.CVM
             using (BinaryWriter writer = new BinaryWriter(stream, System.Text.Encoding.Default, true))
                 mRootDirectoryListing.InternalWrite(writer);
         }
+
+        public void Save(Stream stream, int offset, CvmDirectoryListing.Region region)
+        {
+            using (BinaryWriter writer = new BinaryWriter(stream, System.Text.Encoding.Default, true))
+            {
+                mRootDirectoryListing.InternalWrite(writer, false, offset, region);
+            }
+        }
     }
 } 
