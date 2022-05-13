@@ -42,10 +42,10 @@
         private CvmDirectoryListingEntry mOriginEntry; // the entry this listing originates from, null if it's the root directory
         private CvmDirectoryListingEntry[] mSubEntries;
 
-        internal CvmDirectoryListing(BinaryReader reader, CvmDirectoryListingEntry originEntry)
+        internal CvmDirectoryListing(BinaryReader reader, CvmDirectoryListingEntry originEntry, Region type = 0)
         {
             mOriginEntry = originEntry;
-            InternalRead(reader);
+            InternalRead(reader, type);
         }
 
         public CvmDirectoryListingEntry OriginEntry
@@ -91,16 +91,33 @@
             {
                 if (i > 1 && mSubEntries[i].Flags.HasFlagUnchecked(RecordFlags.DirectoryRecord))
                 {
-                    if (SDFfound == true)
+                    if (type == Region.NTSC)
                     {
-                        SDFfound = false;
-                        writer.SetPosition(0x5377F0);
-                    }
+                        if (SDFfound == true)
+                        {
+                            SDFfound = false;
+                            writer.SetPosition(0x5377F0); // USA
+                        }
 
-                    if (mSubEntries[i].Name == "SFD" && SDFfound == false)
+                        if (mSubEntries[i].Name == "SFD" && SDFfound == false)
+                        {
+                            writer.SetPosition(0x6CDF00); // USA
+                            SDFfound = true;
+                        }
+                    }
+                    else if (type == Region.PAL)
                     {
-                        writer.SetPosition(offset);
-                        SDFfound = true;
+                        if (SDFfound == true)
+                        {
+                            SDFfound = false;
+                            writer.SetPosition(0x539AA0); // EU
+                        }
+
+                        if (mSubEntries[i].Name == "SFD" && SDFfound == false)
+                        {
+                            writer.SetPosition(0x6D0280); // EU
+                            SDFfound = true;
+                        }
                     }
 
                     mSubEntries[i].DirectoryListing.InternalWrite(writer, SDFfound, offset, type);
@@ -108,7 +125,7 @@
             }
         }
 
-        private void InternalRead(BinaryReader reader)
+        private void InternalRead(BinaryReader reader, Region type = 0)
         {
             mHeader = reader.ReadStructure<CvmDirectoryListingHeader>(CvmDirectoryListingHeader.SIZE);
             mSubEntries = new CvmDirectoryListingEntry[mHeader.entryCount];
@@ -124,19 +141,36 @@
             {
                 if (i > 1 && mSubEntries[i].Flags.HasFlagUnchecked(RecordFlags.DirectoryRecord))
                 {
-                    if (SDFfound == true)
+                    if (type == Region.NTSC)
                     {
-                        SDFfound = false;
-                        reader.SetPosition(0x5377F0); // USA
-                    }
+                        if (SDFfound == true)
+                        {
+                            SDFfound = false;
+                            reader.SetPosition(0x5377F0); // USA
+                        }
 
-                    if (mSubEntries[i].Name == "SFD" && SDFfound == false)
+                        if (mSubEntries[i].Name == "SFD" && SDFfound == false)
+                        {
+                            reader.SetPosition(0x6CDF00); // USA
+                            SDFfound = true;
+                        }
+                    } 
+                    else if (type == Region.PAL)
                     {
-                        reader.SetPosition(0x6CDF00); // USA
-                        SDFfound = true;
-                    }
+                        if (SDFfound == true)
+                        {
+                            SDFfound = false;
+                            reader.SetPosition(0x539AA0); // EU
+                        }
 
-                    mSubEntries[i].DirectoryListing = new CvmDirectoryListing(reader, mSubEntries[i]);
+                        if (mSubEntries[i].Name == "SFD" && SDFfound == false)
+                        {
+                            reader.SetPosition(0x6D0280); // EU
+                            SDFfound = true;
+                        }
+                    }
+                    
+                    mSubEntries[i].DirectoryListing = new CvmDirectoryListing(reader, mSubEntries[i], type);
                 }
             }
         }

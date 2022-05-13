@@ -45,7 +45,7 @@ namespace PersonaPatcher
             { ELF_SIZE_PERSONA3FES_NTSC,            Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
             { ELF_SIZE_PERSONA3_NTSC,               Tuple.Create(CVM_LIST_OFFSET_PERSONA3_NTSC,     CVM_ORDER_PERSONA3) },
             { ELF_SIZE_PERSONA3FESEXPANDED_NTSC,    Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_NTSC,  CVM_ORDER_PERSONA3) },
-            { ELF_SIZE_PERSONA3FESEXPANDED_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,      CVM_ORDER_PERSONA3) },
+            { ELF_SIZE_PERSONA3FESEXPANDED_PAL,     Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,   CVM_ORDER_PERSONA3) },
             { ELF_SIZE_PERSONA3FES_PAL,             Tuple.Create(CVM_LIST_OFFSET_PERSONA3FES_PAL,   CVM_ORDER_PERSONA3) }
         };
 
@@ -84,7 +84,12 @@ namespace PersonaPatcher
                 cvmExecutableListings = new CvmExecutableListing[data.Item2.Length];
                 for (int i = 0; i < cvmExecutableListings.Length; i++)
                 {
-                    cvmExecutableListings[i] = new CvmExecutableListing(stream);
+                    if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_NTSC)
+                        cvmExecutableListings[i] = new CvmExecutableListing(stream, CvmDirectoryListing.Region.NTSC);
+                    else if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_PAL)
+                        cvmExecutableListings[i] = new CvmExecutableListing(stream, CvmDirectoryListing.Region.PAL);
+                    else
+                        cvmExecutableListings[i] = new CvmExecutableListing(stream);
                 }
 
                 // read data after listing
@@ -117,17 +122,11 @@ namespace PersonaPatcher
                 foreach (CvmExecutableListing cvmExecutableList in cvmExecutableListings)
                 {
                     if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_NTSC)
-                    {
                         cvmExecutableList.Save(writer.BaseStream, CVM_LIST_OFFSET_PERSONA3FESEXPANDED_NTSC, CvmDirectoryListing.Region.NTSC);
-                    } 
                     else if (filelenght == ELF_SIZE_PERSONA3FESEXPANDED_PAL)
-                    {
-                        cvmExecutableList.Save(writer.BaseStream, CVM_LIST_OFFSET_PERSONA3FESEXPANDED_PAL, CvmDirectoryListing.Region.NTSC);
-                    }
+                        cvmExecutableList.Save(writer.BaseStream, CVM_LIST_OFFSET_PERSONA3FESEXPANDED_PAL, CvmDirectoryListing.Region.PAL);
                     else
-                    {
                         cvmExecutableList.Save(writer.BaseStream);
-                    }
                 }
 
                 writer.Write(elfFooter);

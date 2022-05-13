@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using static AmicitiaLibrary.FileSystems.CVM.CvmDirectoryListing;
 
 namespace AmicitiaLibrary.FileSystems.CVM
 {
@@ -17,10 +18,10 @@ namespace AmicitiaLibrary.FileSystems.CVM
                 mRootDirectoryListing = new CvmDirectoryListing(reader, null);
         }
 
-        public CvmExecutableListing(Stream stream)
+        public CvmExecutableListing(Stream stream, Region type = 0)
         {
             using (BinaryReader reader = new BinaryReader(stream, System.Text.Encoding.Default, true))
-                mRootDirectoryListing = new CvmDirectoryListing(reader, null);
+                mRootDirectoryListing = new CvmDirectoryListing(reader, null, type);
         }
 
         public void Update(CvmFile cvm)
